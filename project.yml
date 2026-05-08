@@ -39,7 +39,7 @@ targets:
           - UIInterfaceOrientationPortrait
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
-        GADApplicationIdentifier: ca-app-pub-9404799280370656~PLACEHOLDER
+        GADApplicationIdentifier: ca-app-pub-9404799280370656~9352372298
         NSUserTrackingUsageDescription: "広告の表示品質を改善するために使用します。"
         NSLocationWhenInUseUsageDescription: "近くの手紙を見つけるために位置情報を使います。"
         NSAppTransportSecurity:

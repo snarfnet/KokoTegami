@@ -4,6 +4,7 @@ struct LetterDetailView: View {
     let letter: Letter
     let firebase: FirebaseService
     let locationManager: LocationManager
+    let interstitial: InterstitialAdManager
     let onDismiss: () -> Void
 
     @State private var isReading = false
@@ -151,6 +152,7 @@ struct LetterDetailView: View {
             await MainActor.run {
                 readComplete = true
                 isReading = false
+                interstitial.letterRead()
             }
         }
     }

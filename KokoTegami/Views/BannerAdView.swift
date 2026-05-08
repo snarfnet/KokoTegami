@@ -5,7 +5,7 @@ struct BannerAdView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         let vc = UIViewController()
         let banner = BannerView()
-        banner.adUnitID = "ca-app-pub-9404799280370656/PLACEHOLDER"
+        banner.adUnitID = "ca-app-pub-9404799280370656/4475065692"
         banner.rootViewController = vc
         banner.translatesAutoresizingMaskIntoConstraints = false
         vc.view.addSubview(banner)

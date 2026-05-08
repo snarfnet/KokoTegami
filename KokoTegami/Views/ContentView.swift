@@ -10,6 +10,7 @@ struct ContentView: View {
             span: MKCoordinateSpan(latitudeDelta: 15, longitudeDelta: 15)
         )
     )
+    @StateObject private var interstitial = InterstitialAdManager()
     @State private var selectedLetter: Letter?
     @State private var showCompose = false
     @State private var showDetail = false
@@ -33,7 +34,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showDetail) {
             if let letter = selectedLetter {
-                LetterDetailView(letter: letter, firebase: firebase, locationManager: locationManager) {
+                LetterDetailView(letter: letter, firebase: firebase, locationManager: locationManager, interstitial: interstitial) {
                     showDetail = false
                     selectedLetter = nil
                 }
