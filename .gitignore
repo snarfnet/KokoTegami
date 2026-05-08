@@ -1,0 +1,16 @@
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+build/
+.build/
+Pods/
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.p8
+*.p12
+serviceAccountKey.json
+GoogleService-Info.plist
+.DS_Store
+.omc/

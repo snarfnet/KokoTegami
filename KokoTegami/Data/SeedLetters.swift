@@ -1,0 +1,57 @@
+import Foundation
+
+struct SeedLetter {
+    let text: String
+    let latitude: Double
+    let longitude: Double
+}
+
+let seedLetters: [SeedLetter] = [
+    SeedLetter(text: "東京駅の雑踏の中で、ふと立ち止まった。あなたにこの言葉を届けたかった。「急がなくていい。」", latitude: 35.6812, longitude: 139.7671),
+    SeedLetter(text: "道頓堀の川面にネオンが揺れてる。笑いの街で書く、たったひとつの本音。「たまには泣いてもいい。」", latitude: 34.6687, longitude: 135.5013),
+    SeedLetter(text: "時計台の前で待ち合わせた人は来なかった。でもこの手紙を読んでくれたあなたがいる。それでいい。", latitude: 43.0625, longitude: 141.3544),
+    SeedLetter(text: "仙台の並木道を歩いてたら、急に伝えたくなった。「あなたが頑張ってること、誰かが知ってる。」", latitude: 38.2601, longitude: 140.8825),
+    SeedLetter(text: "横浜の海風が気持ちいい。この風ごと届けたかった。深呼吸して。", latitude: 35.4437, longitude: 139.6380),
+    SeedLetter(text: "名古屋城の石垣みたいに、あなたの土台はもう十分できてる。あとは積み上げるだけ。", latitude: 35.1815, longitude: 136.9066),
+    SeedLetter(text: "京都の路地裏で見つけた小さな花。誰にも気づかれなくても咲いてる。あなたもそう。", latitude: 35.0116, longitude: 135.7681),
+    SeedLetter(text: "神戸の坂道を登りきった先の景色。しんどい道の先には必ず何かある。", latitude: 34.6901, longitude: 135.1956),
+    SeedLetter(text: "広島の平和公園で書いてる。当たり前の日常がどれだけ尊いか。今日も生きてる。それだけで十分。", latitude: 34.3955, longitude: 132.4536),
+    SeedLetter(text: "福岡の屋台でラーメン食べた後に書いてる。温かいものを食べると、なんか大丈夫な気がする。", latitude: 33.5902, longitude: 130.4017),
+    SeedLetter(text: "那覇の空は広い。悩みごとも、この空に比べたら小さく見える。", latitude: 26.3344, longitude: 127.6809),
+    SeedLetter(text: "長崎の坂の街。登るのは大変だけど、振り返ると絶景が待ってる。人生もそんなもの。", latitude: 32.7503, longitude: 129.8779),
+    SeedLetter(text: "熊本城の復興を見てきた。壊れても直せる。何度でもやり直せる。", latitude: 32.8032, longitude: 130.7079),
+    SeedLetter(text: "鹿児島から桜島を眺めてる。あの山みたいに、たまには怒ってもいいんだよ。", latitude: 31.5966, longitude: 130.5571),
+    SeedLetter(text: "大分の温泉に浸かりながら思った。「休むことも仕事のうち。」", latitude: 33.2382, longitude: 131.6126),
+    SeedLetter(text: "宮崎の日差しは暖かい。あなたの心も少しでも暖まりますように。", latitude: 31.9111, longitude: 131.4239),
+    SeedLetter(text: "佐賀の静かな田んぼ道で。何もない場所にも、ちゃんと風は吹いてる。", latitude: 33.2494, longitude: 130.2988),
+    SeedLetter(text: "松山の路面電車に揺られて書いてる。ゆっくり進むのも悪くない。", latitude: 33.8416, longitude: 132.7657),
+    SeedLetter(text: "高松の讃岐うどんは安くてうまい。幸せって意外とシンプル。", latitude: 34.3401, longitude: 134.0434),
+    SeedLetter(text: "徳島の阿波踊り。踊る阿呆に見る阿呆。どうせなら踊った方がいい。", latitude: 34.0658, longitude: 134.5593),
+    SeedLetter(text: "高知の四万十川は透き通ってる。心もこうでありたい。", latitude: 33.5597, longitude: 133.5311),
+    SeedLetter(text: "岡山の後楽園で書いてる。「楽」の字が入ってる庭園。楽しむことを忘れないで。", latitude: 34.6551, longitude: 133.9344),
+    SeedLetter(text: "鳥取砂丘の風紋。風が作る模様は二度と同じにならない。今日のあなたも一度きり。", latitude: 35.5401, longitude: 134.2286),
+    SeedLetter(text: "島根の出雲大社。縁結びの神様に頼んでおいた。あなたにいい出会いがありますように。", latitude: 35.4017, longitude: 132.6856),
+    SeedLetter(text: "山口の秋芳洞。暗い道の先に広がる鍾乳洞。トンネルの先は明るい。", latitude: 34.2317, longitude: 131.3050),
+    SeedLetter(text: "金沢の兼六園で雪吊りを見た。冬の備えは大事。でも春は必ず来る。", latitude: 36.5625, longitude: 136.6625),
+    SeedLetter(text: "富山から立山が見える。山は動かない。あなたの芯もそうであってほしい。", latitude: 36.6953, longitude: 137.2113),
+    SeedLetter(text: "福井の恐竜博物館の前で。何億年も前の生き物が今も残ってる。あなたの言葉も残る。", latitude: 36.0652, longitude: 136.2219),
+    SeedLetter(text: "新潟の米は日本一。毎日のごはんをちゃんと食べてる？食べなきゃダメだよ。", latitude: 37.9026, longitude: 139.0236),
+    SeedLetter(text: "長野の善光寺で手を合わせた。信じるものは何でもいい。何かを信じられるのは強さ。", latitude: 36.6591, longitude: 138.1887),
+    SeedLetter(text: "山梨から見る富士山。どこから見ても富士山は富士山。あなたもどこにいてもあなた。", latitude: 35.6642, longitude: 138.5684),
+    SeedLetter(text: "静岡のお茶畑は緑がきれい。一杯のお茶を飲む時間くらい、自分に許してあげて。", latitude: 34.9769, longitude: 138.3831),
+    SeedLetter(text: "岐阜の白川郷。昔の人は助け合って屋根を直した。頼っていいんだよ。", latitude: 36.2576, longitude: 136.9056),
+    SeedLetter(text: "三重の伊勢神宮。二千年続いてるものがある。あなたの悩みは二千年続かない。大丈夫。", latitude: 34.4554, longitude: 136.7254),
+    SeedLetter(text: "滋賀の琵琶湖は日本一大きい湖。大きく構えよう。小さなことは気にしない。", latitude: 35.0045, longitude: 135.8686),
+    SeedLetter(text: "奈良の鹿に睨まれた。動物は正直でいいね。あなたも正直でいていい。", latitude: 34.6851, longitude: 135.8048),
+    SeedLetter(text: "和歌山の白浜で波の音を聞いてる。ざぶん、ざぶん。寄せては返す。失敗も成功も繰り返し。", latitude: 33.6781, longitude: 135.3460),
+    SeedLetter(text: "青森のねぶた祭。でっかい灯籠みたいに、心の中に火を灯そう。", latitude: 40.8244, longitude: 140.7400),
+    SeedLetter(text: "岩手の中尊寺。金色堂は八百年光り続けてる。あなたの中にもそういう光がある。", latitude: 38.9893, longitude: 141.1066),
+    SeedLetter(text: "秋田のなまはげは怖いけど、悪いものを追い払ってくれる。怖いものが味方の時もある。", latitude: 39.7200, longitude: 140.1025),
+    SeedLetter(text: "山形のさくらんぼは小さいけど甘い。小さな幸せを見逃さないで。", latitude: 38.2405, longitude: 140.3634),
+    SeedLetter(text: "福島の桃。傷があっても中身は甘い。見た目で判断しないで。自分のことも。", latitude: 37.7500, longitude: 140.4678),
+    SeedLetter(text: "茨城の筑波山。日本百名山で一番低いけど、ちゃんと百名山。高さだけが全てじゃない。", latitude: 36.2257, longitude: 140.1065),
+    SeedLetter(text: "栃木の日光で書いてる。「見ざる言わざる聞かざる」もいいけど、ちゃんと見て聞いて話そう。", latitude: 36.7580, longitude: 139.5986),
+    SeedLetter(text: "群馬の草津温泉。熱いお湯も少しずつ慣れる。新しい環境も同じ。", latitude: 36.6214, longitude: 138.5960),
+    SeedLetter(text: "埼玉はよく「何もない」って言われるけど、住んでる人にとっては大事な場所。あなたの居場所もそう。", latitude: 35.8617, longitude: 139.6455),
+    SeedLetter(text: "千葉の海で夕日を見てる。今日が終わっても、また明日が来る。それだけで十分。", latitude: 35.6074, longitude: 140.1065),
+]
