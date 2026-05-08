@@ -1,21 +1,13 @@
 import SwiftUI
 import GoogleMobileAds
 
-struct BannerAdView: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        let vc = UIViewController()
+struct BannerAdView: UIViewRepresentable {
+    func makeUIView(context: Context) -> BannerView {
         let banner = BannerView()
         banner.adUnitID = "ca-app-pub-9404799280370656/4475065692"
-        banner.rootViewController = vc
-        banner.translatesAutoresizingMaskIntoConstraints = false
-        vc.view.addSubview(banner)
-        NSLayoutConstraint.activate([
-            banner.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
-            banner.bottomAnchor.constraint(equalTo: vc.view.bottomAnchor)
-        ])
         banner.load(Request())
-        return vc
+        return banner
     }
 
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+    func updateUIView(_ uiView: BannerView, context: Context) {}
 }
