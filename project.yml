@@ -63,3 +63,4 @@ targets:
       - package: FirebaseFirestore
         product: FirebaseAuth
       - package: GoogleMobileAds
+        product: GoogleMobileAds
