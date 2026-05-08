@@ -1,24 +1,23 @@
 import GoogleMobileAds
 import UIKit
 
-final class InterstitialAdManager: NSObject, ObservableObject, FullScreenContentDelegate {
+final class InterstitialAdManager: NSObject, ObservableObject, GADFullScreenContentDelegate {
     @Published var readCount = 0
-    private var interstitialAd: InterstitialAd?
+    private var interstitial: GADInterstitialAd?
 
     override init() {
         super.init()
-        Task { await loadAd() }
+        loadAd()
     }
 
-    func loadAd() async {
-        do {
-            interstitialAd = try await InterstitialAd.load(
-                with: "ca-app-pub-9404799280370656/9102530245",
-                request: Request()
-            )
-            interstitialAd?.fullScreenContentDelegate = self
-        } catch {
-            print("Interstitial load error: \(error.localizedDescription)")
+    func loadAd() {
+        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-9404799280370656/9102530245", request: GADRequest()) { [weak self] ad, error in
+            if let error {
+                print("Interstitial load failed: \(error.localizedDescription)")
+                return
+            }
+            self?.interstitial = ad
+            self?.interstitial?.fullScreenContentDelegate = self
         }
     }
 
@@ -30,14 +29,13 @@ final class InterstitialAdManager: NSObject, ObservableObject, FullScreenContent
     }
 
     private func showAd() {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let root = scene.keyWindow?.rootViewController,
-              let ad = interstitialAd else { return }
-        ad.present(from: root)
+        guard let interstitial,
+              let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let root = windowScene.windows.first?.rootViewController else { return }
+        interstitial.present(fromRootViewController: root)
     }
 
-    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        interstitialAd = nil
-        Task { await loadAd() }
+    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        loadAd()
     }
 }

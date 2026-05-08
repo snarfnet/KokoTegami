@@ -6,7 +6,7 @@ import GoogleMobileAds
 struct KokoTegamiApp: App {
     init() {
         FirebaseApp.configure()
-        MobileAds.shared.start()
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
     }
 
     var body: some Scene {
