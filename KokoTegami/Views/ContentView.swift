@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import AppTrackingTransparency
 
 struct ContentView: View {
     @StateObject private var firebase = FirebaseService()
@@ -13,7 +14,7 @@ struct ContentView: View {
     @StateObject private var interstitial = InterstitialAdManager()
     @State private var selectedLetter: Letter?
     @State private var showCompose = false
-    @State private var showDetail = false
+    
     @State private var nearbyLetter: Letter?
 
     var body: some View {
@@ -31,13 +32,12 @@ struct ContentView: View {
         .task {
             await firebase.signIn()
             locationManager.requestPermission()
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            ATTrackingManager.requestTrackingAuthorization { _ in }
         }
-        .sheet(isPresented: $showDetail) {
-            if let letter = selectedLetter {
-                LetterDetailView(letter: letter, firebase: firebase, locationManager: locationManager, interstitial: interstitial) {
-                    showDetail = false
-                    selectedLetter = nil
-                }
+        .sheet(item: $selectedLetter) { letter in
+            LetterDetailView(letter: letter, firebase: firebase, locationManager: locationManager, interstitial: interstitial) {
+                selectedLetter = nil
             }
         }
         .sheet(isPresented: $showCompose) {
@@ -159,7 +159,6 @@ struct ContentView: View {
 
         return Button {
             selectedLetter = letter
-            showDetail = true
         } label: {
             VStack(spacing: 2) {
                 ZStack {
