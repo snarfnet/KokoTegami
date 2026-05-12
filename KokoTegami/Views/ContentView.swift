@@ -25,7 +25,7 @@ struct ContentView: View {
                 headerBar
                 mapView
                 bottomBar
-                BannerAdView()
+                BannerAdView(adUnitID: "ca-app-pub-9404799280370656/4475065692")
                     .frame(height: 50)
             }
         }
