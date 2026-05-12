@@ -14,7 +14,7 @@ struct ContentView: View {
     @StateObject private var interstitial = InterstitialAdManager()
     @State private var selectedLetter: Letter?
     @State private var showCompose = false
-    
+
     @State private var nearbyLetter: Letter?
 
     var body: some View {
@@ -32,18 +32,25 @@ struct ContentView: View {
         .task {
             await firebase.signIn()
             locationManager.requestPermission()
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
-            ATTrackingManager.requestTrackingAuthorization { _ in }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                ATTrackingManager.requestTrackingAuthorization { _ in }
+            }
         }
         .sheet(item: $selectedLetter) { letter in
             LetterDetailView(letter: letter, firebase: firebase, locationManager: locationManager, interstitial: interstitial) {
                 selectedLetter = nil
             }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showCompose) {
             LetterComposeView(firebase: firebase, locationManager: locationManager) {
                 showCompose = false
             }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
         }
     }
 
