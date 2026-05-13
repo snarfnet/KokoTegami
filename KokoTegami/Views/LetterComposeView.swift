@@ -8,6 +8,7 @@ struct LetterComposeView: View {
     @State private var text = ""
     @State private var isSending = false
     @State private var sent = false
+    @FocusState private var isTextEditorFocused: Bool
     private let maxLength = 300
 
     var body: some View {
@@ -52,6 +53,16 @@ struct LetterComposeView: View {
                     .scrollContentBackground(.hidden)
                     .padding(4)
                     .frame(minHeight: 200)
+                    .focused($isTextEditorFocused)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            Button("完了") {
+                                isTextEditorFocused = false
+                            }
+                            .foregroundColor(AppTheme.envelope)
+                        }
+                    }
                     .onChange(of: text) { _, newValue in
                         if newValue.count > maxLength {
                             text = String(newValue.prefix(maxLength))
