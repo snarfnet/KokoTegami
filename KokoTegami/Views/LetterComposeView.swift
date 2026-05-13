@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct LetterComposeView: View {
     let firebase: FirebaseService
@@ -14,6 +15,9 @@ struct LetterComposeView: View {
     var body: some View {
         ZStack {
             AppTheme.nightGradient.ignoresSafeArea()
+                .onTapGesture {
+                    dismissKeyboard()
+                }
 
             VStack(spacing: 20) {
                 VStack(spacing: 8) {
@@ -44,7 +48,8 @@ struct LetterComposeView: View {
     }
 
     private var composeView: some View {
-        VStack(spacing: 16) {
+        ScrollView {
+            VStack(spacing: 16) {
             // Letter paper
             VStack(spacing: 0) {
                 TextEditor(text: $text)
@@ -58,7 +63,7 @@ struct LetterComposeView: View {
                         ToolbarItemGroup(placement: .keyboard) {
                             Spacer()
                             Button("完了") {
-                                isTextEditorFocused = false
+                                dismissKeyboard()
                             }
                             .foregroundColor(AppTheme.envelope)
                         }
@@ -86,12 +91,32 @@ struct LetterComposeView: View {
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .shadow(color: .black.opacity(0.3), radius: 18, y: 10)
 
+            if isTextEditorFocused {
+                Button {
+                    dismissKeyboard()
+                } label: {
+                    Label("キーボードを閉じる", systemImage: "keyboard.chevron.compact.down")
+                        .font(.system(size: 15, weight: .semibold, design: .serif))
+                        .foregroundColor(AppTheme.cream)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(AppTheme.warmGray.opacity(0.22))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+
             HStack(spacing: 16) {
-                Button("やめる") { onDismiss() }
+                Button("やめる") {
+                    dismissKeyboard()
+                    onDismiss()
+                }
                     .font(.system(size: 15, design: .serif))
                     .foregroundColor(AppTheme.fadedBlue)
 
                 Button {
+                    dismissKeyboard()
                     sendLetter()
                 } label: {
                     HStack(spacing: 6) {
@@ -107,7 +132,10 @@ struct LetterComposeView: View {
                 }
                 .disabled(!canSend)
             }
+            }
+            .padding(.bottom, 20)
         }
+        .scrollDismissesKeyboard(.interactively)
     }
 
     private var sentView: some View {
@@ -154,5 +182,10 @@ struct LetterComposeView: View {
                 if success { sent = true }
             }
         }
+    }
+
+    private func dismissKeyboard() {
+        isTextEditorFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
