@@ -30,7 +30,7 @@ targets:
         CFBundleDisplayName: "ここに手紙を置いてきた。"
         CFBundleIconName: AppIcon
         CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "8"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         LSRequiresIPhoneOS: true
         UIDeviceFamily:
           - 1
