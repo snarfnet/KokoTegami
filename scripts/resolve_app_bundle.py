@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import time
 
 import jwt
@@ -34,4 +35,4 @@ bundle_id = attrs.get("bundleId")
 if not bundle_id:
     raise RuntimeError("App Store Connect did not return a bundleId.")
 print(f"APP_BUNDLE_ID={bundle_id}")
-print(f"Resolved Bundle ID: {bundle_id}", flush=True)
+print(f"Resolved Bundle ID: {bundle_id}", file=sys.stderr, flush=True)
