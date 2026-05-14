@@ -9,6 +9,9 @@ struct LetterDetailView: View {
 
     @State private var isReading = false
     @State private var readComplete = false
+    @State private var showReportDialog = false
+    @State private var showBlockConfirm = false
+    @State private var moderationNotice: String?
 
     private var distance: Double? {
         locationManager.distance(to: letter.coordinate)
@@ -46,6 +49,7 @@ struct LetterDetailView: View {
                     // Show letter content
                     VStack(spacing: 16) {
                         letterContent
+                        safetyActions
                         doneButton
                     }
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -93,6 +97,9 @@ struct LetterDetailView: View {
                         Text("10m以内に近づくと読めます")
                             .font(.system(size: 14, design: .serif))
                             .foregroundColor(AppTheme.fadedBlue)
+
+                        safetyActions
+                            .padding(.top, 6)
                     }
                 }
 
@@ -106,6 +113,25 @@ struct LetterDetailView: View {
             .padding()
         }
         .animation(.easeInOut(duration: 0.4), value: readComplete)
+        .confirmationDialog("この手紙を通報しますか", isPresented: $showReportDialog, titleVisibility: .visible) {
+            Button("不適切な内容として通報", role: .destructive) {
+                report(reason: "Objectionable content")
+            }
+            Button("いやがらせとして通報", role: .destructive) {
+                report(reason: "Abusive behavior")
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("通報すると、この手紙はあなたの表示から消えます。開発者が24時間以内に確認します。")
+        }
+        .alert("このユーザーをブロックしますか", isPresented: $showBlockConfirm) {
+            Button("ブロック", role: .destructive) {
+                block()
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("この手紙をすぐに非表示にし、開発者へ通報します。今後このユーザーの手紙は表示されません。")
+        }
     }
 
     private var letterContent: some View {
@@ -139,10 +165,46 @@ struct LetterDetailView: View {
 
     private var doneButton: some View {
         VStack(spacing: 8) {
+            if let moderationNotice {
+                Text(moderationNotice)
+                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .foregroundColor(AppTheme.envelope)
+                    .multilineTextAlignment(.center)
+            }
+
             Text("手紙を1通書く権利を得た")
                 .font(.system(size: 14, design: .serif))
                 .foregroundColor(AppTheme.envelope)
         }
+    }
+
+    private var safetyActions: some View {
+        HStack(spacing: 10) {
+            Button {
+                showReportDialog = true
+            } label: {
+                Label("通報", systemImage: "flag")
+                    .font(.system(size: 14, weight: .semibold, design: .serif))
+                    .foregroundColor(AppTheme.cream)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(AppTheme.warmGray.opacity(0.28))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+
+            Button {
+                showBlockConfirm = true
+            } label: {
+                Label("ブロック", systemImage: "person.crop.circle.badge.xmark")
+                    .font(.system(size: 14, weight: .semibold, design: .serif))
+                    .foregroundColor(AppTheme.cream)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(AppTheme.waxRed.opacity(0.72))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+        }
+        .padding(.horizontal)
     }
 
     private func readLetter() {
@@ -153,6 +215,26 @@ struct LetterDetailView: View {
                 readComplete = true
                 isReading = false
                 interstitial.letterRead()
+            }
+        }
+    }
+
+    private func report(reason: String) {
+        Task {
+            await firebase.reportLetter(letter, reason: reason)
+            await MainActor.run {
+                moderationNotice = "通報しました。開発者が24時間以内に確認します。"
+                onDismiss()
+            }
+        }
+    }
+
+    private func block() {
+        Task {
+            await firebase.blockAuthor(of: letter)
+            await MainActor.run {
+                moderationNotice = "ブロックしました。この手紙は表示から消えました。"
+                onDismiss()
             }
         }
     }

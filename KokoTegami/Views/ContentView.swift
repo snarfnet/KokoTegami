@@ -14,8 +14,7 @@ struct ContentView: View {
     @StateObject private var interstitial = InterstitialAdManager()
     @State private var selectedLetter: Letter?
     @State private var showCompose = false
-
-    @State private var nearbyLetter: Letter?
+    @AppStorage("hasAgreedToSafetyTerms") private var hasAgreedToSafetyTerms = false
 
     var body: some View {
         ZStack {
@@ -30,7 +29,9 @@ struct ContentView: View {
             }
         }
         .task {
-            await firebase.signIn()
+            if hasAgreedToSafetyTerms {
+                await firebase.signIn()
+            }
             locationManager.requestPermission()
         }
         .onAppear {
@@ -51,6 +52,17 @@ struct ContentView: View {
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { !hasAgreedToSafetyTerms },
+            set: { _ in }
+        )) {
+            TermsAgreementView {
+                hasAgreedToSafetyTerms = true
+                Task {
+                    await firebase.signIn()
+                }
+            }
         }
     }
 

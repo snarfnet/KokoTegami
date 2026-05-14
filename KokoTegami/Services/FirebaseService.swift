@@ -7,9 +7,12 @@ final class FirebaseService: ObservableObject {
     @Published var letters: [Letter] = []
     @Published var bonusCredits: Int = 0
     @Published var lastFreeDate: String = ""
+    @Published var blockedUserIds: Set<String> = []
+    @Published var hiddenLetterIds: Set<String> = []
 
     private var userId: String?
     private var listener: ListenerRegistration?
+    private var allLetters: [Letter] = []
 
     var canWriteToday: Bool {
         let today = dateString(Date())
@@ -25,6 +28,7 @@ final class FirebaseService: ObservableObject {
             let result = try await Auth.auth().signInAnonymously()
             userId = result.user.uid
             await loadUserData()
+            await loadSafetyData()
             listenLetters()
         } catch {
             print("Auth error: \(error)")
@@ -46,14 +50,39 @@ final class FirebaseService: ObservableObject {
         }
     }
 
+    private func loadSafetyData() async {
+        guard let uid = userId else { return }
+        do {
+            let blocked = try await db.collection("users").document(uid).collection("blockedUsers").getDocuments()
+            let hidden = try await db.collection("users").document(uid).collection("hiddenLetters").getDocuments()
+            await MainActor.run {
+                self.blockedUserIds = Set(blocked.documents.map(\.documentID))
+                self.hiddenLetterIds = Set(hidden.documents.map(\.documentID))
+                self.applySafetyFilters()
+            }
+        } catch {
+            print("Load safety data error: \(error)")
+        }
+    }
+
     private func listenLetters() {
         listener?.remove()
         listener = db.collection("letters").addSnapshotListener { [weak self] snapshot, error in
             guard let docs = snapshot?.documents else { return }
             let letters = docs.compactMap { try? $0.data(as: Letter.self) }
             DispatchQueue.main.async {
-                self?.letters = letters
+                self?.allLetters = letters
+                self?.applySafetyFilters()
             }
+        }
+    }
+
+    private func applySafetyFilters() {
+        letters = allLetters.filter { letter in
+            guard let id = letter.id else { return false }
+            if hiddenLetterIds.contains(id) { return false }
+            if let authorId = letter.authorId, blockedUserIds.contains(authorId) { return false }
+            return true
         }
     }
 
@@ -75,12 +104,14 @@ final class FirebaseService: ObservableObject {
 
     func writeLetter(text: String, latitude: Double, longitude: Double) async -> Bool {
         guard let uid = userId, canWrite else { return false }
+        guard ContentModeration.objectionableTerm(in: text) == nil else { return false }
 
         let letter = [
             "text": text,
             "latitude": latitude,
             "longitude": longitude,
-            "createdAt": Timestamp(date: Date())
+            "createdAt": Timestamp(date: Date()),
+            "authorId": uid
         ] as [String: Any]
 
         do {
@@ -103,6 +134,74 @@ final class FirebaseService: ObservableObject {
         } catch {
             print("Write letter error: \(error)")
             return false
+        }
+    }
+
+    func reportLetter(_ letter: Letter, reason: String) async {
+        guard let uid = userId, let letterId = letter.id else { return }
+        do {
+            try await db.collection("moderationReports").addDocument(data: [
+                "type": "report",
+                "letterId": letterId,
+                "reportedUserId": letter.authorId ?? "",
+                "reporterUserId": uid,
+                "letterText": letter.text,
+                "reason": reason,
+                "createdAt": Timestamp(date: Date()),
+                "status": "new",
+                "reviewSlaHours": 24
+            ])
+            try await hideLetter(letterId)
+        } catch {
+            print("Report letter error: \(error)")
+        }
+    }
+
+    func blockAuthor(of letter: Letter) async {
+        guard let uid = userId, let letterId = letter.id else { return }
+        let authorId = letter.authorId ?? "unknown-author-\(letterId)"
+
+        do {
+            try await db.collection("moderationReports").addDocument(data: [
+                "type": "block",
+                "letterId": letterId,
+                "reportedUserId": authorId,
+                "reporterUserId": uid,
+                "letterText": letter.text,
+                "reason": "Blocked abusive user",
+                "createdAt": Timestamp(date: Date()),
+                "status": "new",
+                "reviewSlaHours": 24
+            ])
+
+            if let realAuthorId = letter.authorId, realAuthorId != uid {
+                try await db.collection("users").document(uid).collection("blockedUsers").document(realAuthorId).setData([
+                    "createdAt": Timestamp(date: Date()),
+                    "sourceLetterId": letterId
+                ])
+            }
+            try await hideLetter(letterId)
+
+            await MainActor.run {
+                if let realAuthorId = letter.authorId {
+                    self.blockedUserIds.insert(realAuthorId)
+                }
+                self.hiddenLetterIds.insert(letterId)
+                self.applySafetyFilters()
+            }
+        } catch {
+            print("Block author error: \(error)")
+        }
+    }
+
+    private func hideLetter(_ letterId: String) async throws {
+        guard let uid = userId else { return }
+        try await db.collection("users").document(uid).collection("hiddenLetters").document(letterId).setData([
+            "createdAt": Timestamp(date: Date())
+        ])
+        await MainActor.run {
+            self.hiddenLetterIds.insert(letterId)
+            self.applySafetyFilters()
         }
     }
 

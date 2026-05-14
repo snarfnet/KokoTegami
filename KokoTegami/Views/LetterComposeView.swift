@@ -9,6 +9,7 @@ struct LetterComposeView: View {
     @State private var text = ""
     @State private var isSending = false
     @State private var sent = false
+    @State private var moderationMessage: String?
     @FocusState private var isTextEditorFocused: Bool
     private let maxLength = 300
 
@@ -72,6 +73,11 @@ struct LetterComposeView: View {
                         if newValue.count > maxLength {
                             text = String(newValue.prefix(maxLength))
                         }
+                        if ContentModeration.objectionableTerm(in: newValue) != nil {
+                            moderationMessage = "不適切な内容を含む手紙は投稿できません。"
+                        } else {
+                            moderationMessage = nil
+                        }
                     }
 
                 HStack {
@@ -90,6 +96,16 @@ struct LetterComposeView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .shadow(color: .black.opacity(0.3), radius: 18, y: 10)
+
+            if let moderationMessage {
+                Label(moderationMessage, systemImage: "exclamationmark.shield")
+                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .foregroundColor(AppTheme.cream)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(AppTheme.waxRed.opacity(0.72))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
 
             if isTextEditorFocused {
                 Button {
@@ -166,10 +182,16 @@ struct LetterComposeView: View {
             && !isSending
             && firebase.canWrite
             && locationManager.location != nil
+            && moderationMessage == nil
     }
 
     private func sendLetter() {
         guard let loc = locationManager.location else { return }
+        if ContentModeration.objectionableTerm(in: text) != nil {
+            moderationMessage = "不適切な内容を含む手紙は投稿できません。"
+            return
+        }
+
         isSending = true
         Task {
             let success = await firebase.writeLetter(
@@ -180,6 +202,9 @@ struct LetterComposeView: View {
             await MainActor.run {
                 isSending = false
                 if success { sent = true }
+                if !success {
+                    moderationMessage = "投稿できませんでした。内容を見直してください。"
+                }
             }
         }
     }

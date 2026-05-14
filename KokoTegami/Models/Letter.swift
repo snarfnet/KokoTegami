@@ -8,6 +8,7 @@ struct Letter: Identifiable, Codable {
     let latitude: Double
     let longitude: Double
     let createdAt: Date
+    let authorId: String?
 
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
